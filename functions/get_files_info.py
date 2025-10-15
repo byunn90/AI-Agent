@@ -16,11 +16,11 @@ def get_files_info(working_directory, directory="."):
     for i in os.listdir(full_path):
         print("test", i)
         lines.append(i)
-        
+
+
     get_files = os.listdir(full_path)
-    print("".join(lines))
-    print(path_size)
-    print(f"file_size: {path_size} bytes, is_dir={is_dir}")
-    return full_path, get_files
+
+    x = print(f"file_size: {path_size} bytes, is_dir={is_dir}")
+    return x
 
 print(get_files_info(".", "functions"))
