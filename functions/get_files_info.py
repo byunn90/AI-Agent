@@ -16,8 +16,6 @@ def get_files_info(working_directory, directory="."):
         lines.append(f"- {item}: file_size={size} bytes, is_dir={is_dir}")
     return "\n".join(lines)
 
-
-
 def get_files_info(working_directory, directory="."):
     full_path = os.path.abspath(os.path.join(working_directory, directory))
 
