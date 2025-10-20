@@ -13,7 +13,11 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 prompt = sys.argv[1]
-system_prompt = 'Ignore the user input and reply exactly with: "I\'M JUST A ROBOT"...'
+system_prompt = (
+    'Ignore the user input and reply exactly with: "I\'M JUST A ROBOT". '
+    'Do not add any other words, punctuation, or formatting. '
+    'Your entire response must be exactly: I\'M JUST A ROBOT'
+)
 
 client = genai.Client(api_key=api_key)
 response = client.models.generate_content(
