@@ -1,6 +1,7 @@
 import os
 from google.genai import types
 
+
 def get_files_info(working_directory, directory="."):
     full_path = os.path.abspath(os.path.join(working_directory, directory))
 
@@ -26,16 +27,10 @@ schema_get_files_info = types.FunctionDeclaration(
         properties={
             "directory": types.Schema(
                 type=types.Type.STRING,
-                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+                description="Directory to list, relative to the working directory. Defaults to '.'.",
             ),
         },
     ),
 )
-available_functions = types.Tool(
-    function_declarations=[
-        schema_get_files_info,
-    ]
-)
 
-    
 
