@@ -54,13 +54,13 @@ response = client.models.generate_content(
     config=config
 )
 
-# parts = response.parts[0].function_response.response
-# first = parts[0]
+parts = response.parts[0].function_response.response
+first = parts[0]
 
-# getattr(part, "function_call", None):
-#     for parts in parts:
-#         # get pay load
-#         payload = function_call_result.parts[0].function_response.response 
+getattr(part, "function_call", None):
+    for parts in parts:
+        # get pay load
+        payload = function_call_result.parts[0].function_response.response 
 
 prompt_tokens = response.usage_metadata.prompt_token_count
 response_tokens = response.usage_metadata.candidates_token_count
