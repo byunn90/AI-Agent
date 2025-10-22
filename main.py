@@ -28,6 +28,7 @@ When a user asks a question or makes a request, make a function call plan. You c
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
 
+
 client = genai.Client(api_key=api_key)
 
 config = types.GenerateContentConfig(
@@ -41,6 +42,15 @@ response = client.models.generate_content(
     config=config
 )
 
+# parts = response.parts[0].function_response.response
+# first = parts[0]
+# print("hi", parts)
+
+# getattr(part, "function_call", None):
+#     for parts in parts:
+#         # get pay load
+#         payload = function_call_result.parts[0].function_response.response 
+
 prompt_tokens = response.usage_metadata.prompt_token_count
 response_tokens = response.usage_metadata.candidates_token_count
 
@@ -48,6 +58,7 @@ if is_verbose:
     print(f"User prompt: {prompt}")
     print(f"Prompt tokens: {prompt_tokens}")
     print(f"Response tokens: {response_tokens}")
+    print(f"response: {response.text}")
 
 
 
