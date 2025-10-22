@@ -55,18 +55,18 @@ response = client.models.generate_content(
     contents=prompt,
     config=config
 )
+found_fc = False
+for part in response.candidates[0].content.parts:
+    fc = getattr(part, "function_call", None)
+    if fc:
+        found_fc = True
+        # do your normal call_function stuff here
+        tool_msg = call_function(fc, verbose=is_verbose)
+        payload = tool_msg.parts[0].function_response.response
+        print("✅ payload:", payload)
 
-parts = response.parts[0].function_response.response
-first = parts[0]
-
-getattr(part, "function_call", None):
-    for parts in parts:
-        # get pay load
-        payload = function_call_result.parts[0].function_response.response 
-
-
-
-
+if not found_fc:
+    raise RuntimeError("❌ No function_call found in Gemini response")
 
 prompt_tokens = response.usage_metadata.prompt_token_count
 response_tokens = response.usage_metadata.candidates_token_count

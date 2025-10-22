@@ -1,7 +1,5 @@
 # render.py
-
 import json
-
 
 def format_json_output(expression: str, result: float, indent: int = 2) -> str:
     if isinstance(result, float) and result.is_integer():
