@@ -44,7 +44,6 @@ response = client.models.generate_content(
 
 # parts = response.parts[0].function_response.response
 # first = parts[0]
-# print("hi", parts)
 
 # getattr(part, "function_call", None):
 #     for parts in parts:
