@@ -40,9 +40,6 @@ Choose sensible defaults:
 
 When appropriate, automatically display the new file's contents after writing it.
 """
-
-
-
 client = genai.Client(api_key=api_key)
 
 config = types.GenerateContentConfig(
@@ -56,17 +53,20 @@ response = client.models.generate_content(
     config=config
 )
 found_fc = False
+print(response)
 for part in response.candidates[0].content.parts:
     fc = getattr(part, "function_call", None)
     if fc:
         found_fc = True
-        # do your normal call_function stuff here
         tool_msg = call_function(fc, verbose=is_verbose)
         payload = tool_msg.parts[0].function_response.response
         print("✅ payload:", payload)
 
 if not found_fc:
     raise RuntimeError("❌ No function_call found in Gemini response")
+
+generate_content = response
+
 
 prompt_tokens = response.usage_metadata.prompt_token_count
 response_tokens = response.usage_metadata.candidates_token_count
