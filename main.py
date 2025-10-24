@@ -15,30 +15,30 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 prompt = sys.argv[1]
-system_prompt = system_prompt = """
+system_prompt = """
 You are a helpful AI coding agent.
 
-When a user asks a question or makes a request, make a function call plan. 
+When a user asks about how the code works or to fix/inspect something,
+DO NOT ask for clarification first. Instead:
+1) Call get_files_info to see what's in the directory.
+2) Then call get_file_content on the most relevant files (e.g., main.py).
+3) Only after inspecting files should you answer or proceed to run/write.
+
 You can perform the following operations:
+- List files and directories (get_files_info)
+- Read file contents (get_file_content)
+- Execute Python files with optional arguments (run_python_file)
+- Write or overwrite files (write_file)
 
-- List files and directories
-- Read file contents
-- Execute Python files with optional arguments
-- Write or overwrite files
+Rules:
+- All paths are relative to the working directory (which will be injected).
+- If asked to create/save/generate content, use write_file directly:
+  - Default directory: "."
+  - Default file name: "notes.txt"
+  - Default file format: .txt
+  - After writing, display its contents with get_file_content.
 
-All paths you provide should be relative to the working directory. 
-You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
-
-If a user asks to create, save, or generate content (for example, write notes, create a txt file, or save an explanation), 
-do NOT ask for clarification like “What should I name the file?”. 
-Instead, use the write_file tool directly. 
-
-Choose sensible defaults:
-- Default directory: "."
-- Default file name: "notes.txt"
-- Default file format: plain text (.txt)
-
-When appropriate, automatically display the new file's contents after writing it.
+Be decisive. Prefer acting with tools over asking questions.
 """
 client = genai.Client(api_key=api_key)
 
@@ -53,7 +53,6 @@ response = client.models.generate_content(
     config=config
 )
 found_fc = False
-print(response)
 for part in response.candidates[0].content.parts:
     fc = getattr(part, "function_call", None)
     if fc:
@@ -78,29 +77,50 @@ if is_verbose:
     print(f"response: {response.text}")
 
 def generate_content():
-    messages = []
+    messages = [
+        types.Content(role="user", parts=[types.Part(text=prompt)])
+    ]
 
-    reponse = client.models.generate_content(
-        model="gemini-2.0-flash-001",
-        contents=prompt
-
-    )
     config = types.GenerateContentConfig(
         tools=[available_functions],
         system_instruction=system_prompt,
     )
-    for part in response.candidates[0].content.parts:
-        check = getattr(part, "function_call", None)
-        if not check:
-             print(response.text)    
-            
-        else:
-            raise Exception("Error: Gemini tried to call a function")
-    X = config
-    print("TESTING DEBUG", config)      
-    for client_text in messages
-        messages.append(response.text)
-    print("Debug Testing 🐜"messages)    
+
+    try:
+        for i in range(20):
+            content_catcher = client.models.generate_content(
+                model="gemini-2.0-flash-001",
+                contents=messages,
+                config=config
+            )
+
+            model_msg = content_catcher.candidates[0].content
+            messages.append(model_msg)
+
+            found_fc = False
+            for part in model_msg.parts:
+                fc = getattr(part, "function_call", None)
+                if fc:
+                    tool_msg = call_function(fc, verbose=is_verbose)
+                    messages.append(tool_msg)
+                    found_fc = True
+                    break          
+
+            if found_fc:
+                continue
+
+
+            print(content_catcher.text)
+            return
+
+
+        print("⚠️ Reached 20 iterations—stopping.")
+        return
+
+    except Exception as e:
+        print(f"❌ Agent error: {e}")
+        return
+
 
 
 
