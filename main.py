@@ -65,17 +65,47 @@ for part in response.candidates[0].content.parts:
 if not found_fc:
     raise RuntimeError("❌ No function_call found in Gemini response")
 
-generate_content = response
-
 
 prompt_tokens = response.usage_metadata.prompt_token_count
 response_tokens = response.usage_metadata.candidates_token_count
+
+
 
 if is_verbose:
     print(f"User prompt: {prompt}")
     print(f"Prompt tokens: {prompt_tokens}")
     print(f"Response tokens: {response_tokens}")
-    print(f"response: {response}")
+    print(f"response: {response.text}")
+
+def generate_content():
+    messages = []
+
+    reponse = client.models.generate_content(
+        model="gemini-2.0-flash-001",
+        contents=prompt
+
+    )
+    config = types.GenerateContentConfig(
+        tools=[available_functions],
+        system_instruction=system_prompt,
+    )
+    for part in response.candidates[0].content.parts:
+        check = getattr(part, "function_call", None)
+        if not check:
+             print(response.text)    
+            
+        else:
+            raise Exception("Error: Gemini tried to call a function")
+    X = config
+    print("TESTING DEBUG", config)      
+    for client_text in messages
+        messages.append(response.text)
+    print("Debug Testing 🐜"messages)    
 
 
+
+
+    
+
+print(generate_content())
 
